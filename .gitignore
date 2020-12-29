@@ -1,0 +1,5 @@
+/SteamListEnv
+/__pycache__/
+.env
+
+/Models/__pycache__/
