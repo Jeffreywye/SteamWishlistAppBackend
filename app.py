@@ -33,27 +33,27 @@ def login():
     login_json = request.get_json()
 
     if not login_json:
-        return jsonify({'msg': 'Missing JSON'}), 400
+        return jsonify({'msg': 'Missing JSON' , 'type':'error'}), 400
 
     email = login_json.get('email')
     password = login_json.get('password')
 
     if not email:
-        return jsonify({'msg': 'Email is missing'}), 400
+        return jsonify({'msg': 'Email is missing', 'type':'error'}), 400
 
     if not password:
-        return jsonify({'msg': 'Password is missing'}), 400
+        return jsonify({'msg': 'Password is missing', 'type':'error'}), 400
 
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        return jsonify({"msg": 'Email Not Found'}), 401
+        return jsonify({"msg": 'Email Not Found', 'type':'error'}), 401
     
     if not user.verify_password(password):
-        return jsonify({"msg": 'Wrong Password'}), 401
+        return jsonify({"msg": 'Wrong Password', 'type':'error'}), 401
 
     jwt_token = create_access_token(identity=user.id)
-    return jsonify({'access_token': jwt_token}), 200
+    return jsonify({'access_token': jwt_token, 'type':'success'}), 200
 
 
 @app.route('/api/signup', methods=['POST'])
@@ -61,25 +61,25 @@ def sign_up():
     login_json = request.get_json()
 
     if not login_json:
-        return jsonify({'msg': 'Missing JSON'}), 400
+        return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
 
     email = login_json.get('email')
     password = login_json.get('password')
 
     if not email:
-        return jsonify({'msg': 'Email is missing'}), 400
+        return jsonify({'msg': 'Email is missing', 'type':'error'}), 400
 
     if not password:
-        return jsonify({'msg': 'Password is missing'}), 400
+        return jsonify({'msg': 'Password is missing', 'type':'error'}), 400
 
     if User.query.filter_by(email = email).first() is not None:
-        return jsonify({'msg': "Email Already Exists"}), 400
+        return jsonify({'msg': "Email Already Exists", 'type':'error'}), 400
     
     user=User(email=email)
     user.hash_password(password)
     db.session.add(user)
     db.session.commit()
-    return jsonify({'msg': 'User '+email+" Created"}), 201
+    return jsonify({'msg': 'User '+email+" Created", 'type':'success'}), 201
 
 @app.route('/api/users/<int:id>')
 def get_user(id):
