@@ -59,7 +59,8 @@ def login():
 @app.route('/api/signup', methods=['POST'])
 def sign_up():
     login_json = request.get_json()
-
+    print("")
+    print(login_json)
     if not login_json:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
 
@@ -94,6 +95,11 @@ def protected():
     identity = get_jwt_identity()
     return jsonify({'msg': 'You can open this YAY',
     "id": identity}), 200
+
+@app.route('/api/verify', methods=['GET'])
+@jwt_required
+def verify_user():
+    return jsonify({'msg': 'confirmed'}) , 200
 
 if __name__ == '__main__':
     if database_exists(conn):
