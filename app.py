@@ -6,7 +6,8 @@ from config import conn
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from flask_jwt_extended import (JWTManager, create_access_token,
-                                get_jwt_identity, jwt_required)
+                                get_jwt_identity, jwt_required,
+                                jwt_refresh_token_required, create_refresh_token)
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -16,12 +17,6 @@ CORS(app)
 
 @app.route('/', methods=['GET'])
 def entry():
-    # test = User(email = "test@abc.com")
-    # test.hash_password("1234")
-    # db.session.add(test)
-    # db.session.commit()
-    # return (jsonify({'email': test.email}), 201,
-    #         {'Location': url_for('get_user', id=test.id, _external=True)})
     users = User.query.all()
     ret = []
     for user in users:
@@ -52,8 +47,13 @@ def login():
     if not user.verify_password(password):
         return jsonify({"msg": 'Wrong Password', 'type':'error'}), 401
 
+    ret = {
+        "access_token": create_access_token(identity=user.id),
+        "refresh_token": create_refresh_token(identity=user.id),
+        "type":"success"
+    }
     jwt_token = create_access_token(identity=user.id)
-    return jsonify({'access_token': jwt_token, 'type':'success'}), 200
+    return jsonify(ret), 200
 
 
 @app.route('/api/signup', methods=['POST'])
@@ -100,6 +100,15 @@ def protected():
 @jwt_required
 def verify_user():
     return jsonify({'msg': 'confirmed'}) , 200
+
+@app.route('/token/refresh', methods=['POST'])
+@jwt_refresh_token_required
+def refresh():
+    identity = get_jwt_identity()
+    ret = {
+        'access_token': create_access_token(identity=identity)
+    }
+    return jsonify(ret),200
 
 if __name__ == '__main__':
     if database_exists(conn):
