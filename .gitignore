@@ -3,3 +3,4 @@
 .env
 
 /Models/__pycache__/
+/Steam/__pycache__/

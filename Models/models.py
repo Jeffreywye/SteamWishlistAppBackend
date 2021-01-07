@@ -27,8 +27,9 @@ class User(db.Model):
 class Game(db.Model):
     __tablename__ = 'games'
     app_id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(120), nullable = False)
+    name = db.Column(db.String(240), nullable = False)
     init_price = db.Column(db.Integer)
     final_price = db.Column(db.Integer)
     discount_percent = db.Column(db.Integer)
-    last_updated = db.Column(db.DateTime, default= datetime.utcnow)
+    # last_updated = db.Column(db.DateTime, default= datetime.utcnow)
+    last_updated = db.Column(db.DateTime)

@@ -1,13 +1,17 @@
 import os
 from flask import Flask, jsonify, request, url_for, abort
 from flask_cors import CORS
+
 from Models.models import db, User
+import Queries
+
 from config import conn
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required,
                                 jwt_refresh_token_required, create_refresh_token)
+
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -118,5 +122,9 @@ if __name__ == '__main__':
         create_database(engine.url)
         with app.app_context():
             db.create_all()
+            # couldn't add majority of games to db
+            # Prob should focus on wishlist than list of games
+            # steam = Queries.SteamQueries(db)
+            # steam.initSteamDB()
 
     app.run(debug=True)

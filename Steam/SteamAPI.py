@@ -7,12 +7,10 @@ class SteamAPI:
     def getGames(self):
         resp = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v2/')
         data = resp.json()['applist']['apps']
-
         apps = []
         for app in data:
             apps.append(app)
-            # print(app) 
-
+            # print(app)
         return apps
 
     def requestGameData(self, app_id):
@@ -43,6 +41,6 @@ apps = steam.getGames()
 # print(apps[4])
 # print(len(apps))
 # appPrices = []
-for index in range(20):
-    id = apps[index]['appid']
-    steam.requestGameData(id)
+# for index in range(20):
+#     id = apps[index]['appid']
+#     steam.requestGameData(id)
