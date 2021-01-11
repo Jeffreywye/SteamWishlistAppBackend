@@ -24,3 +24,33 @@ class SteamQueries:
                 print(app)
                 print(e)
 
+
+class Queries:
+    def __init__(self, db):
+        self._db = db
+        self._steam = SteamAPI()
+
+    def getWishlist(self, id):
+        pass
+
+    def addToWishlist(self, id, appID):
+        data = self._steam.requestGameData(appID)
+        if data:
+            if 'free' in data:
+                pass
+            else:
+                pass
+            # game = Game(app_id=,
+            #             name=,
+            #             init_price=,
+            #             final_price=,
+            #             discount_percent=, 
+            #             )
+   
+        return False
+
+    def updateWishlistGame(self, id):
+        pass
+
+    def removeFromWishlist(self, id, appID):
+        pass

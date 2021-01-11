@@ -31,5 +31,4 @@ class Game(db.Model):
     init_price = db.Column(db.Integer)
     final_price = db.Column(db.Integer)
     discount_percent = db.Column(db.Integer)
-    # last_updated = db.Column(db.DateTime, default= datetime.utcnow)
-    last_updated = db.Column(db.DateTime)
+    last_updated = db.Column(db.DateTime, default= datetime.utcnow)

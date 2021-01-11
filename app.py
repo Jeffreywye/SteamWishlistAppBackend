@@ -113,6 +113,21 @@ def refresh():
     }
     return jsonify(ret),200
 
+@app.route('/api/getWishlist', methods=['GET'])
+@jwt_required
+def get_wishlist():
+    return []
+
+@app.route('/api/addToWishlist', methods=['POST'])
+@jwt_required
+def addToPlayerWishlist():
+    return []
+
+@app.route('/api/deleteFromWishlist', methods=['DELETE'])
+@jwt_required
+def remFromPlayerWishlist():
+    return []
+
 if __name__ == '__main__':
     if database_exists(conn):
         print("DB Exists")
