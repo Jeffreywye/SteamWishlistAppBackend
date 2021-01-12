@@ -15,9 +15,7 @@ class SteamAPI:
 
     # must change format
     def requestGameData(self, app_id):
-        # if is success but no price over_view is returned then game is FREE
-    
-        url = "http://store.steampowered.com/api/appdetails?appids="+str(app_id)+"&cc=us&l=en&filters=price_overview"
+        url = "http://store.steampowered.com/api/appdetails?appids="+str(app_id)+"&cc=us&l=en"
         resp = requests.get(url)
         data = resp.json()[str(app_id)]
         ret = {}
@@ -25,18 +23,28 @@ class SteamAPI:
             ret['msg'] = 'failed'
             return []
         else:
+            ret = {}
             data = data['data']
-            if not data:
-                # game/dlc is free
-                return ['free']
+            ret['name'] = data['name']
+            ret['appid'] = data['steam_appid']
+            ret['is_free'] = data['is_free']
+
+            if ret['is_free']:
+                return ret
+            elif 'price_overview' in data:
+                ret['init_price'] = data['price_overview']['initial']
+                ret['final_price'] = data['price_overview']['final']
+                ret['discount'] = data['price_overview']['discount_percent']
+                return ret
             else:
-                # game/dlc has a price
-                return data
+                # unreleased game
+                return []
         
         
 # steam = SteamAPI()
 # apps = steam.getGames()
 # appPrices = []
-# for index in range(20):
+# for index in range(10):
 #     id = apps[index]['appid']
-#     steam.requestGameData(id)
+#     data = steam.requestGameData(id)
+#     print(data)

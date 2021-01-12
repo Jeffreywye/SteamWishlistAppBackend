@@ -86,11 +86,12 @@ def sign_up():
     return jsonify({'msg': 'User '+email+" Created", 'type':'success'}), 201
 
 @app.route('/api/users/<int:id>')
+@jwt_required
 def get_user(id):
     user = User.query.get(id)
     if not user:
         abort(400)
-    return jsonify({'username': user.email})
+    return jsonify({'username': user.email}), 200
 
 @app.route('/api/protected', methods=['GET'])
 @jwt_required
@@ -137,9 +138,5 @@ if __name__ == '__main__':
         create_database(engine.url)
         with app.app_context():
             db.create_all()
-            # couldn't add majority of games to db
-            # Prob should focus on wishlist than list of games
-            # steam = Queries.SteamQueries(db)
-            # steam.initSteamDB()
 
     app.run(debug=True)

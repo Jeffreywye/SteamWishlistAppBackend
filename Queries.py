@@ -1,5 +1,5 @@
 from Steam.SteamAPI import SteamAPI
-from Models.models import Game
+from Models.models import User, Game
 
 # this file will hold all sql queries related to steam
 # must test if db object/instance can be passed 
@@ -34,20 +34,46 @@ class Queries:
         pass
 
     def addToWishlist(self, id, appID):
-        data = self._steam.requestGameData(appID)
-        if data:
-            if 'free' in data:
-                pass
-            else:
-                pass
-            # game = Game(app_id=,
-            #             name=,
-            #             init_price=,
-            #             final_price=,
-            #             discount_percent=, 
-            #             )
-   
+        user = User.query.get(id)
+        game = Game.query.get(appID)
+
+        if game:
+            #game exist in db
+            # then check if it is up to data
+            last_updated = game.last_updated
+            return True
+
+        else:
+            # if game doesnt exist in db 
+            # then add it in
+            app = self._steam.requestGameData(appID)
+            if app:
+                game = None
+                if app['is_free']:
+                    game = Game(app_id=app['appid'],
+                                name=app['name'],
+                                init_price=0,
+                                final_price=0,
+                                discount_percent=0, 
+                                )
+                else:
+                    game = Game(app_id=app['appid'],
+                                name=app['name'],
+                                init_price=app['init_price'],
+                                final_price=app['final_price'],
+                                discount_percent=app['discount'], 
+                                )
+                try:
+                    self._db.session.add(game)
+                    user.games.append(game)
+                    self._db.session.commit()
+                    return True
+                except:
+                    return False
         return False
+
+    def checkGameInList(self, id, appID):
+        
 
     def updateWishlistGame(self, id):
         pass
