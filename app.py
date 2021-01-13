@@ -148,7 +148,7 @@ def test():
     if not appID:
         return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
     queries = Queries.Queries(db)
-    res = queries.addToWishlist(2,appID)
+    res = queries.addToWishlist(1,appID)
     return jsonify([res]), 200
 
 if __name__ == '__main__':
