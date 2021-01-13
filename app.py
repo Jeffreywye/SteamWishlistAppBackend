@@ -1,8 +1,9 @@
 import os
+from datetime import datetime
 from flask import Flask, jsonify, request, url_for, abort
 from flask_cors import CORS
 
-from Models.models import db, User
+from Models.models import db, User, Game
 import Queries
 
 from config import conn
@@ -25,6 +26,14 @@ def entry():
     ret = []
     for user in users:
         ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
+    return jsonify(ret)
+
+@app.route('/games', methods=['GET'])
+def games():
+    games = Game.query.all()
+    ret = []
+    for game in games:
+        ret.append( {'id': game.app_id, 'name': game.name, 'init': game.init_price, 'final': game.final_price, 'discount': game.discount_percent, 'last_up': game.last_updated, "now": datetime.utcnow() } )
     return jsonify(ret)
 
 @app.route('/api/login', methods=['POST'])
@@ -128,6 +137,19 @@ def addToPlayerWishlist():
 @jwt_required
 def remFromPlayerWishlist():
     return []
+
+@app.route('/api/test', methods=['POST'])
+def test():
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
+    
+    appID = json_data.get('appID')
+    if not appID:
+        return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
+    queries = Queries.Queries(db)
+    res = queries.addToWishlist(2,appID)
+    return jsonify([res]), 200
 
 if __name__ == '__main__':
     if database_exists(conn):

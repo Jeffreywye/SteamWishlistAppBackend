@@ -1,3 +1,4 @@
+from datetime import datetime
 from Steam.SteamAPI import SteamAPI
 from Models.models import User, Game
 
@@ -6,23 +7,23 @@ from Models.models import User, Game
 # when this file is imported to apps
 
 # must put list of games on hold since, can't add the games to db atm
-class SteamQueries:
-    def __init__(self, db):
-        self._db = db
-        self._steam = SteamAPI()
+# class SteamQueries:
+#     def __init__(self, db):
+#         self._db = db
+#         self._steam = SteamAPI()
 
-    def initSteamDB(self):
-        data = self._steam.getGames()
-        for app in data:
-            game = Game(app_id=app['appid'],
-                        name=app['name'])
-            try:
-                self._db.session.add(game)
-                self._db.session.commit()
-            except Exception as e:
-                print("Error at ")
-                print(app)
-                print(e)
+#     def initSteamDB(self):
+#         data = self._steam.getGames()
+#         for app in data:
+#             game = Game(app_id=app['appid'],
+#                         name=app['name'])
+#             try:
+#                 self._db.session.add(game)
+#                 self._db.session.commit()
+#             except Exception as e:
+#                 print("Error at ")
+#                 print(app)
+#                 print(e)
 
 
 class Queries:
@@ -41,9 +42,20 @@ class Queries:
             #game exist in db
             # then check if it is up to data
             last_updated = game.last_updated
-            return True
+            print('\n Times')
+            print(last_updated)
+            print(datetime.utcnow())
+            print((datetime.utcnow()-last_updated).total_seconds())
+            print(120 < (datetime.utcnow()-last_updated).total_seconds())
+            # then check if game is already added to the users list
+            print("does user already have game")
+            res = self.checkGameInList(user,appID)
+            print(res)
+            print()
+            return res
 
         else:
+            print("game not in db")
             # if game doesnt exist in db 
             # then add it in
             app = self._steam.requestGameData(appID)
@@ -72,10 +84,14 @@ class Queries:
                     return False
         return False
 
-    def checkGameInList(self, id, appID):
-        
+    def checkGameInList(self, userObj, appID):
+        check = userObj.games.filter_by(app_id=appID).all()
+        if check:
+            return True
+        else:
+            return False
 
-    def updateWishlistGame(self, id):
+    def updateWishlistGame(self, appID):
         pass
 
     def removeFromWishlist(self, id, appID):

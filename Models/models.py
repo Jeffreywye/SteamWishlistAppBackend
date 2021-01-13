@@ -16,7 +16,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     games = db.relationship("Game", 
                             secondary=wishlist_table,
-                            backref="users")
+                            backref="users",
+                            lazy="dynamic")
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
