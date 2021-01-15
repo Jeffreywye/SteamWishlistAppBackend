@@ -28,7 +28,31 @@ class Queries:
         self._steam = SteamAPI()
 
     def getWishlist(self, id):
-        pass
+        ret = []
+        outdatedGames = []
+        try:
+            games = User.query.get(id).games
+            for game in games:
+                last_up = game.last_updated
+                if (86400 < (datetime.utcnow()-last_up).total_seconds()):
+                    outdatedGames.append(game)
+                else:
+                    item = {}
+                    item['Name'] = game.name
+                    item['appID'] = game.app_id
+                    item['init_price'] = game.init_price
+                    item['final_price'] = game.final_price
+                    item['discount'] = game.discount_percent
+                    ret.append(item)
+            
+            for game in outdatedGames:
+                item = self.updateWishlistGame(game,game.app_id)
+                ret.append(item)
+
+        except Exception:
+            pass
+
+        return ret
 
     def addToWishlist(self, id, appID):
         user = User.query.get(id)
@@ -42,7 +66,6 @@ class Queries:
                 # if game is in user's list
                 # then failed to add game into list
                 res = False
-                print("game in list already")
             else:
                 # game not in user's list
                 try:
@@ -58,7 +81,8 @@ class Queries:
             last_updated = game.last_updated
             if (86400 < (datetime.utcnow()-last_updated).total_seconds()):
                 # if the game hasn't been updated in 24 hour update it
-                res = self.updateWishlistGame(game, appID)
+                obj = self.updateWishlistGame(game, appID)
+                res = True if obj else False
             return res
 
         else:
@@ -87,28 +111,44 @@ class Queries:
 
     def updateWishlistGame(self, sqlGameObj, appID):
         app = self._steam.requestGameData(appID)
-        ret = False
+        ret = {}
         if app:
             sqlGameObj.app_id = app['appid']
             sqlGameObj.name = app['name']
+            ret = {}
+            ret['Name'] = app['name']
+            ret['appID'] = app['appid']
             if app['is_free']:
                 sqlGameObj.init_price = 0
                 sqlGameObj.final_price = 0
                 sqlGameObj.discount_percent = 0
+                ret['init_price'] = 0
+                ret['final_price'] = 0
+                ret['discount'] = 0 
             else:
-                sqlGameObj.init_price=app['init_price']
-                sqlGameObj.final_price=app['final_price']
-                sqlGameObj.discount_percent=app['discount']
+                sqlGameObj.init_price = app['init_price']
+                sqlGameObj.final_price = app['final_price']
+                sqlGameObj.discount_percent = app['discount']
+                ret['init_price'] = app['init_price']
+                ret['final_price'] = app['final_price']
+                ret['discount'] = app['discount'] 
             sqlGameObj.last_updated = datetime.utcnow()
             try:
                 self._db.session.commit()
-                ret = True
             except:
-                ret = False
+                ret = {}
         return ret
 
     def removeFromWishlist(self, id, appID):
-        pass
+        user = User.query.get(id)
+        game = Game.query.get(appID)
+        try:
+            user.games.remove(game)
+            self._db.session.commit()
+            return True
+        except:
+            return False
+        return False
 
     def createGameObj(self, appID):
         app = self._steam.requestGameData(appID)

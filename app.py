@@ -131,15 +131,6 @@ def get_wishlist():
 @app.route('/api/addToWishlist', methods=['POST'])
 @jwt_required
 def addToPlayerWishlist():
-    return []
-
-@app.route('/api/deleteFromWishlist', methods=['DELETE'])
-@jwt_required
-def remFromPlayerWishlist():
-    return []
-
-@app.route('/api/test', methods=['POST'])
-def test():
     json_data = request.get_json()
     if not json_data:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
@@ -150,6 +141,33 @@ def test():
     queries = Queries.Queries(db)
     res = queries.addToWishlist(1,appID)
     return jsonify([res]), 200
+
+@app.route('/api/deleteFromWishlist', methods=['DELETE'])
+@jwt_required
+def remFromPlayerWishlist():
+    return []
+
+@app.route('/api/test', methods=['DELETE'])
+def test():
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
+    
+    appID = json_data.get('appID')
+    if not appID:
+        return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
+
+    queries = Queries.Queries(db)
+    # res = queries.addToWishlist(1,appID)
+    res = queries.removeFromWishlist(2,appID)
+
+    return jsonify([res]), 200
+
+@app.route('/api/usersGames', methods=['GET'])
+def testWishList():
+    queries = Queries.Queries(db)
+    games = queries.getWishlist(2)
+    return jsonify(games), 200
 
 if __name__ == '__main__':
     if database_exists(conn):
