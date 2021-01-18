@@ -20,21 +20,21 @@ jwt = JWTManager(app)
 db.init_app(app)
 CORS(app)
 
-@app.route('/', methods=['GET'])
-def entry():
-    users = User.query.all()
-    ret = []
-    for user in users:
-        ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
-    return jsonify(ret)
+# @app.route('/', methods=['GET'])
+# def entry():
+#     users = User.query.all()
+#     ret = []
+#     for user in users:
+#         ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
+#     return jsonify(ret)
 
-@app.route('/games', methods=['GET'])
-def games():
-    games = Game.query.all()
-    ret = []
-    for game in games:
-        ret.append( {'id': game.app_id, 'name': game.name, 'init': game.init_price, 'final': game.final_price, 'discount': game.discount_percent, 'last_up': game.last_updated, "now": datetime.utcnow() } )
-    return jsonify(ret)
+# @app.route('/games', methods=['GET'])
+# def games():
+#     games = Game.query.all()
+#     ret = []
+#     for game in games:
+#         ret.append( {'id': game.app_id, 'name': game.name, 'init': game.init_price, 'final': game.final_price, 'discount': game.discount_percent, 'last_up': game.last_updated, "now": datetime.utcnow() } )
+#     return jsonify(ret)
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -126,12 +126,19 @@ def refresh():
 @app.route('/api/getWishlist', methods=['GET'])
 @jwt_required
 def get_wishlist():
-    return []
+    identity = get_jwt_identity()
+    queries = Queries.Queries(db)
+    try:
+        games = queries.getWishlist(identity)
+    except:
+        return jsonify("Failed to retrive list"), 500
+    return jsonify(games), 200
 
 @app.route('/api/addToWishlist', methods=['POST'])
 @jwt_required
 def addToPlayerWishlist():
     json_data = request.get_json()
+    identity = get_jwt_identity()
     if not json_data:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
     
@@ -139,16 +146,15 @@ def addToPlayerWishlist():
     if not appID:
         return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
     queries = Queries.Queries(db)
-    res = queries.addToWishlist(1,appID)
-    return jsonify([res]), 200
+    res = queries.addToWishlist(identity,appID)
+    if not res:
+        return jsonify({"msg": "Failed to add app" }), 400
+    return jsonify({'msg':'Added App Successfully'}), 200
 
 @app.route('/api/deleteFromWishlist', methods=['DELETE'])
 @jwt_required
 def remFromPlayerWishlist():
-    return []
-
-@app.route('/api/test', methods=['DELETE'])
-def test():
+    identity = get_jwt_identity()
     json_data = request.get_json()
     if not json_data:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
@@ -158,16 +164,10 @@ def test():
         return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
 
     queries = Queries.Queries(db)
-    # res = queries.addToWishlist(1,appID)
-    res = queries.removeFromWishlist(2,appID)
-
-    return jsonify([res]), 200
-
-@app.route('/api/usersGames', methods=['GET'])
-def testWishList():
-    queries = Queries.Queries(db)
-    games = queries.getWishlist(2)
-    return jsonify(games), 200
+    res = queries.removeFromWishlist(identity,appID)
+    if not res:
+        return jsonify({"msg": "Failed to remove from list" }), 500
+    return jsonify({'msg':'App removed'}), 200
 
 if __name__ == '__main__':
     if database_exists(conn):
