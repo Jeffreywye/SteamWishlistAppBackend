@@ -38,7 +38,7 @@ class Queries:
                     outdatedGames.append(game)
                 else:
                     item = {}
-                    item['Name'] = game.name
+                    item['name'] = game.name
                     item['appID'] = game.app_id
                     item['init_price'] = game.init_price
                     item['final_price'] = game.final_price
@@ -116,7 +116,7 @@ class Queries:
             sqlGameObj.app_id = app['appid']
             sqlGameObj.name = app['name']
             ret = {}
-            ret['Name'] = app['name']
+            ret['name'] = app['name']
             ret['appID'] = app['appid']
             if app['is_free']:
                 sqlGameObj.init_price = 0
