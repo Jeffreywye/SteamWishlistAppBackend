@@ -149,7 +149,7 @@ def addToPlayerWishlist():
     res = queries.addToWishlist(identity,appID)
     if not res:
         return jsonify({"msg": "Failed to add app" }), 400
-    return jsonify({'msg':'Added App Successfully'}), 200
+    return jsonify(res), 200
 
 @app.route('/api/deleteFromWishlist', methods=['DELETE'])
 @jwt_required
