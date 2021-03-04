@@ -54,9 +54,11 @@ class Queries:
 
         return ret
 
+    # returns an object of game data or False
     def addToWishlist(self, id, appID):
         user = User.query.get(id)
         game = Game.query.get(appID)
+        ret = {}
 
         if game:
             #game exist in db
@@ -72,7 +74,12 @@ class Queries:
                     user.games.append(game)
                     self._db.session.commit()
                     # successfully added game
-                    res = True
+                    ret['name'] = game.name
+                    ret['appID'] = game.app_id
+                    ret['init_price'] = game.init_price
+                    ret['final_price'] = game.final_price
+                    ret['discount'] = game.discount_percent
+                    res = ret
                 except:
                     # anything goes wrong commiting, then failed to add game
                     res = False
@@ -82,7 +89,7 @@ class Queries:
             if (86400 < (datetime.utcnow()-last_updated).total_seconds()):
                 # if the game hasn't been updated in 24 hour update it
                 obj = self.updateWishlistGame(game, appID)
-                res = True if obj else False
+                res = obj if obj else False
             return res
 
         else:
@@ -94,7 +101,13 @@ class Queries:
                     self._db.session.add(game)
                     user.games.append(game)
                     self._db.session.commit()
-                    return True
+                    
+                    ret['name'] = game.name
+                    ret['appID'] = game.app_id
+                    ret['init_price'] = game.init_price
+                    ret['final_price'] = game.final_price
+                    ret['discount'] = game.discount_percent
+                    return ret
                 except:
                     return False
         return False
