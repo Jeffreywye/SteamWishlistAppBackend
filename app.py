@@ -142,9 +142,11 @@ def addToPlayerWishlist():
     if not json_data:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
     
-    appID = json_data.get('appID')
-    if not appID:
+    try:
+        appID = int(json_data.get('appID'))
+    except:
         return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
+        
     queries = Queries.Queries(db)
     res = queries.addToWishlist(identity,appID)
     if not res:
@@ -159,8 +161,9 @@ def remFromPlayerWishlist():
     if not json_data:
         return jsonify({'msg': 'Missing JSON', 'type':'error'}), 400
     
-    appID = json_data.get('appID')
-    if not appID:
+    try:
+        appID = int(json_data.get('appID'))
+    except:
         return jsonify({'msg': 'Missing appID', 'type':'error'}), 400
 
     queries = Queries.Queries(db)
