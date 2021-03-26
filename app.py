@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from flask import Flask, jsonify, request, url_for, abort
 from flask_cors import CORS
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from Models.models import db, User, Game
 import Queries
@@ -35,6 +36,16 @@ CORS(app)
 #     for game in games:
 #         ret.append( {'id': game.app_id, 'name': game.name, 'init': game.init_price, 'final': game.final_price, 'discount': game.discount_percent, 'last_up': game.last_updated, "now": datetime.utcnow() } )
 #     return jsonify(ret)
+
+def sendEmails():
+    with app.app_context():
+        queries = Queries.Queries(db)
+        try:
+            userGames = queries.getUsersGames()
+            print(userGames)
+        except:
+            pass
+        # print(emails)
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -181,5 +192,10 @@ if __name__ == '__main__':
         create_database(engine.url)
         with app.app_context():
             db.create_all()
+    
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(sendEmails,"interval",seconds=10)
+    scheduler.start()
 
     app.run(debug=True)
+    

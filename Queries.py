@@ -27,6 +27,42 @@ class Queries:
         self._db = db
         self._steam = SteamAPI()
 
+    def getUsersGames(self):
+        ret = {}
+        try:
+            result = User.query.join(Game, User.games).add_columns(Game.app_id, Game.name, Game.discount_percent, Game.final_price, Game.init_price).all()  
+            for row in result:
+                if row.User.id not in ret:
+                    ret[row.User.id] = {}
+                    ret[row.User.id]['id'] = row.User.id
+                    ret[row.User.id]['email'] = row.User.email
+                    ret[row.User.id]['games'] = []
+
+                game = {}
+                game["appID"] = row.app_id
+                game["name"] = row.name
+                game["discount percent"] = row.discount_percent
+                game["init price"] = row.init_price
+                game["final price"] = row.final_price
+                ret[row.User.id]['games'].append(game) 
+        except Exception as e:
+            print(e)
+            
+        return ret
+
+    def updateGames(self):
+        try:
+            games = Game.query.all()
+            for game in games:
+                last_up = game.last_updated
+                if (86400 < (datetime.utcnow()-last_up).total_seconds()):
+                    # game is outdated
+                    self.updateWishlistGame(game,game.app_id)
+                
+            return True
+        except:
+            return False
+
     def getWishlist(self, id):
         ret = []
         outdatedGames = []
