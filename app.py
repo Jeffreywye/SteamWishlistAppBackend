@@ -42,9 +42,7 @@ CORS(app)
 
 def reformatGamesToEmail(gamesList):
     ret = "Games On Sale Today\n"
-    print(gamesList)
     for game in gamesList:
-        print(game)
         ret = ret + "\nTitle: "+ str(game['name']) + "\nApp ID: "+ str(game['appID'])+ "\nCurrent Price: "+ str(game['final price'])+"\nOriginal Price: "+ str(game['init price'])+"\nDiscount Percent: "+ str(game['discount percent'])+'\n'
     return ret
 
@@ -230,8 +228,8 @@ if __name__ == '__main__':
             db.create_all()
     
     scheduler = BackgroundScheduler()
-    scheduler.add_job(sendEmails,"cron",minute="*/10")
+    scheduler.add_job(sendEmails,"cron",minute="0", hour="0")
     scheduler.start()
 
-    app.run(debug=True)
+    app.run()
     

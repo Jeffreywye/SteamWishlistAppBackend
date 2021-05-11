@@ -11,12 +11,14 @@ DEBUG = True
 SECRET_KEY = environ.get('SECRET_KEY')
 
 # SQL Alchemy configs
-user = environ.get('USER')
-password = environ.get('PASSWORD')
-host = environ.get('HOST')
+user = environ.get('PG_USER')
+password = environ.get('PG_PASS')
+host = environ.get('PG_HOST')
 dbName = environ.get('DBNAME')
 # dbPath = path.join(basedir, "Models" , dbName)
-conn = "mysql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
+# conn = "mysql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
+
+conn = "postgresql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
 # print(conn)
 SQLALCHEMY_DATABASE_URI = conn
 SQLALCHEMY_ECHO = True
