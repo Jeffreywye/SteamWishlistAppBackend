@@ -7,7 +7,7 @@ basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
 # Flask configs
-DEBUG = True
+DEBUG = False
 SECRET_KEY = environ.get('SECRET_KEY')
 
 # SQL Alchemy configs
@@ -16,9 +16,16 @@ password = environ.get('PG_PASS')
 host = environ.get('PG_HOST')
 dbName = environ.get('DBNAME')
 # dbPath = path.join(basedir, "Models" , dbName)
+
+# Local mysql connection
 # conn = "mysql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
 
-conn = "postgresql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
+# Local Postgres Connection
+# conn = "postgresql://{0}:{1}@{2}/{3}".format(user, password, host, dbName)
+
+# Production Connection
+conn = environ.get('DATABASE_URL')
+
 # print(conn)
 SQLALCHEMY_DATABASE_URI = conn
 SQLALCHEMY_ECHO = True

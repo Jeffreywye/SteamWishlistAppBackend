@@ -24,13 +24,13 @@ mail.init_app(app)
 db.init_app(app)
 CORS(app)
 
-# @app.route('/', methods=['GET'])
-# def entry():
-#     users = User.query.all()
-#     ret = []
-#     for user in users:
-#         ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
-#     return jsonify(ret)
+@app.route('/', methods=['GET'])
+def entry():
+    users = User.query.all()
+    ret = []
+    for user in users:
+        ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
+    return jsonify(ret)
 
 # @app.route('/games', methods=['GET'])
 # def games():
@@ -72,7 +72,7 @@ def sendEmails():
 #             # print(userGames[userId]['games'])
 #             emailBody = reformatGamesToEmail(userGames[userId]['games'])
 #             print("sent "+emailBody)
-#             msg = Message(subject="Steam Games Update", sender="colbalt393@gmail.com", recipients=[userGames[userId]['email']])
+#             msg = Message(subject="Steam Games Update", sender="", recipients=[userGames[userId]['email']])
 #             msg.body = emailBody
 #             mail.send(msg)
 #         except Exception as e:
