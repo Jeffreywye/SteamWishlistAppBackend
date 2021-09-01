@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from flask import Flask, jsonify, request, url_for, abort
+from flask import Flask, json, jsonify, request, url_for, abort
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_mail import Mail, Message
@@ -69,6 +69,7 @@ def sendEmails():
 @app.route('/mail', methods=['Get'])
 def testMail():
     sendEmails()
+    return jsonify([]), 200
     
 
 @app.route('/api/login', methods=['POST'])
