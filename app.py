@@ -48,10 +48,14 @@ def reformatGamesToEmail(gamesList):
         ret = ret + "\nTitle: "+ str(game['name']) + "\nApp ID: "+ str(game['appID'])+ "\nCurrent Price: "+ str(game['final price'])+"\nOriginal Price: "+ str(game['init price'])+"\nDiscount Percent: "+ str(game['discount percent'])+'\n'
     return ret
 
+
 def sendEmails():
     with app.app_context():
         queries = Queries.Queries(db)
         userGames = queries.getUsersGames()
+        if not queries.updateGames():
+            print("Failed to update games")
+
         for userId in userGames:
             try:
                 emailBody = reformatGamesToEmail(userGames[userId]['games'])
@@ -62,26 +66,10 @@ def sendEmails():
                 print("\nFailed to send mail to "+userGames[userId]['email']+"\n")
                 print(e)
 
-# @app.route('/mail', methods=['Get'])
-# def sendMail():
-#     queries = Queries.Queries(db)
-#     if not queries.updateGames():
-#         print("Failed to update games")
+@app.route('/mail', methods=['Get'])
+def testMail():
+    sendEmails()
     
-#     userGames = queries.getUsersGames()
-#     for userId in userGames:
-#         try:
-#             # print(userGames[userId]['games'])
-#             emailBody = reformatGamesToEmail(userGames[userId]['games'])
-#             print("sent "+emailBody)
-#             msg = Message(subject="Steam Games Update", sender="", recipients=[userGames[userId]['email']])
-#             msg.body = emailBody
-#             mail.send(msg)
-#         except Exception as e:
-#             print("\nFailed to send mail to "+userGames[userId]['email']+"\n")
-#             print(e)
-    
-#     return jsonify(userGames), 200
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -230,7 +218,7 @@ if __name__ == '__main__':
             db.create_all()
     
     scheduler = BackgroundScheduler()
-    scheduler.add_job(sendEmails,"cron",minute="0", hour="0")
+    scheduler.add_job(sendEmails,"cron",minute="*/10", hour="*")
     scheduler.start()
 
     app.run()
