@@ -24,15 +24,15 @@ mail.init_app(app)
 db.init_app(app)
 CORS(app)
 
-# @app.route('/', methods=['GET'])
-# def entry():
-#     users = User.query.all()
-#     ret = []
-#     if not users:
-#         return jsonify(["empty"])
-#     for user in users:
-#         ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
-#     return jsonify(ret)
+@app.route('/', methods=['GET'])
+def entry():
+    users = User.query.all()
+    ret = []
+    if not users:
+        return jsonify(["empty"])
+    for user in users:
+        ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
+    return jsonify(ret)
 
 # @app.route('/games', methods=['GET'])
 # def games():
