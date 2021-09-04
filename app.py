@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from flask import Flask, json, jsonify, request, url_for, abort
 from flask_cors import CORS
-from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
 from flask_mail import Mail, Message
 
 from Models.models import db, User, Game
@@ -24,15 +24,15 @@ mail.init_app(app)
 db.init_app(app)
 CORS(app)
 
-@app.route('/', methods=['GET'])
-def entry():
-    users = User.query.all()
-    ret = []
-    if not users:
-        return jsonify(["empty"])
-    for user in users:
-        ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
-    return jsonify(ret)
+# @app.route('/', methods=['GET'])
+# def entry():
+#     users = User.query.all()
+#     ret = []
+#     if not users:
+#         return jsonify(["empty"])
+#     for user in users:
+#         ret.append( {'id': user.id, 'email': user.email, 'hashed_pass': user.password_hash } )
+#     return jsonify(ret)
 
 # @app.route('/games', methods=['GET'])
 # def games():
@@ -52,10 +52,11 @@ def reformatGamesToEmail(gamesList):
 def sendEmails():
     with app.app_context():
         queries = Queries.Queries(db)
-        userGames = queries.getUsersGames()
+        
         if not queries.updateGames():
             print("Failed to update games")
 
+        userGames = queries.getUsersGames()
         for userId in userGames:
             try:
                 emailBody = reformatGamesToEmail(userGames[userId]['games'])
@@ -66,12 +67,12 @@ def sendEmails():
                 print("\nFailed to send mail to "+userGames[userId]['email']+"\n")
                 print(e)
 
-@app.route('/mail', methods=['Get'])
-def testMail():
-    sendEmails()
-    return jsonify([]), 200
+# test route
+# @app.route('/mail', methods=['Get'])
+# def testMail():
+#     sendEmails()
+#     return jsonify([]), 200
     
-
 @app.route('/api/login', methods=['POST'])
 def login():
     login_json = request.get_json()
@@ -218,9 +219,10 @@ if __name__ == '__main__':
         with app.app_context():
             db.create_all()
     
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(sendEmails,"cron",minute="*/10", hour="*")
-    scheduler.start()
+    # not needed for production
+    # scheduler = BackgroundScheduler()
+    # scheduler.add_job(sendEmails,"cron",minute="*/10", hour="*")
+    # scheduler.start()
 
     app.run()
     

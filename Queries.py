@@ -197,7 +197,6 @@ class Queries:
             return True
         except:
             return False
-        return False
 
     def createGameObj(self, appID):
         app = self._steam.requestGameData(appID)
