@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from flask import Flask, json, jsonify, request, url_for, abort
 from flask_cors import CORS
@@ -43,7 +42,8 @@ CORS(app)
 #     return jsonify(ret)
 
 def reformatGamesToEmail(gamesList):
-    ret = "Games On Sale Today\n"
+    today = datetime.now().strftime("%m-%d-%Y")
+    ret = "Games On Sale "+today+"\n"
     for game in gamesList:
         ret = ret + "\nTitle: "+ str(game['name']) + "\nApp ID: "+ str(game['appID'])+ "\nCurrent Price: "+ str(game['final price'])+"\nOriginal Price: "+ str(game['init price'])+"\nDiscount Percent: "+ str(game['discount percent'])+'\n'
     return ret
